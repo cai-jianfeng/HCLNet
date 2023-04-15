@@ -1,6 +1,7 @@
 """
 created on:2022/11/13 11:29
 @author:caijianfeng
+@Purpose: there are Heterogeneous Network, Simple CNN, Dual-path CNN, and classifier of Beam Search(Simple CNN)
 """
 import torch
 from torch import nn
@@ -37,9 +38,9 @@ class HetNet(nn.Module):
         self.mp_1d = nn.MaxPool1d(kernel_size=(2,))
         self.mp_2d = nn.MaxPool2d(kernel_size=(2, 2))
         self.fc2 = nn.Linear(256, 128)
-        self.fc3 = nn.Linear(128, 2 * 30)
+        self.fc3 = nn.Linear(128, 2 * self.dim)
         # self.batchnorm1d_3 = nn.BatchNorm1d(num_features=60)
-        self.fc4 = nn.Linear(2 * 30, 30)
+        self.fc4 = nn.Linear(2 * self.dim, self.dim)
         self.dropout = nn.Dropout()
     
     def forward(self, data1, data2):

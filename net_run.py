@@ -1,7 +1,12 @@
 """
 created on:2022/11/18 15:16
 @author:caijianfeng
+@Purpose: this code file covers
+            1. CL, fine-tuning/train, eval and predict step;
+            2. result calculate(OA, AA, Kappa)
 """
+import warnings
+
 import torch
 import os
 import sys
@@ -16,8 +21,8 @@ class run:
     def __init__(self):
         pass
 
-    def contrastive(self, model, epoch, train_loader, optimizer, criterion, cost, device=None):
-        running_loss = 0.0
+    def contrastive(self, model, train_loader, optimizer, criterion, cost, device=None):
+        # running_loss = 0.0
         # contrastive_bar = tqdm(train_loader, file=sys.stdout)
         for batch_idx, data in enumerate(train_loader):
             data_T, data_F = data
@@ -203,11 +208,14 @@ class run:
 
     def result_smooth(self, result_path):
         """
+        warning: this code function if cancellation
         (predict) result smooth
         :param result_path: predict result label path -> str
         :return: smooth labels -> numpy.array
         """
-        super_patch = 7
+        warnings.warn("this code function if cancellation", DeprecationWarning)
+        super_patch = 15
+        num_class = 0
         result_book = xlrd.open_workbook(result_path)
         result_sheet = result_book.sheet_by_index(0)
         rows = result_sheet.nrows
@@ -216,7 +224,7 @@ class run:
 
         for row in range(0, rows, super_patch):
             for col in range(0, cols, super_patch):
-                most = np.zeros(5)
+                most = np.zeros(num_class)
                 if row < rows - super_patch and col < cols - super_patch:
                     for i in range(super_patch):
                         for j in range(super_patch):

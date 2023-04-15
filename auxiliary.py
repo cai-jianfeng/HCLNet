@@ -53,7 +53,7 @@ print('predict label concat succeed!')
 # In[2] plot predict/ground-truth label map
 target_path = '/path/to/xxx.xlsx'  # the predicted/ground-truth label
 color_path = '/path/to/xxx.xlsx'  # the colors corresponding to different categories (RGB: 3 columns x N categories)
-label_pic_name = '$map name$'  # the save file name of ploted map
+label_pic_name = '$map name$'  # the save file name of plot map
 plot_mod = plot_mode(mode='predict')
 plot_mod.plot_labels(label_path=target_path,
                      color_path=color_path,

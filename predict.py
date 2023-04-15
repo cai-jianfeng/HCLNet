@@ -12,13 +12,12 @@ import xlsxwriter
 
 from data_preprocess import Data
 from network import DClass_Net
-from torchvision import transforms
 from tqdm import tqdm
 import os
 
 patch_size = [15, 15]
-data_path = ['../data_flevoland15/T_R.xlsx', '../data_flevoland15/T_I.xlsx']
-label_path = '../data_flevoland15/label.xlsx'
+data_path = ['/path/to/T_R.xlsx', '/path/to/T_I.xlsx']
+label_path = '/path/to/label.xlsx'
 data = Data()
 data_R_set = data.get_data_list(data_path=data_path[0])
 data_T_set = data.get_data_list(data_path=data_path[1])
@@ -26,11 +25,11 @@ dim = data_R_set.shape
 cnet = DClass_Net()
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 print(device)
-cnet_param = torch.load('../model_para/flevoland15/contrastive_30.pkl', map_location=device)
+cnet_param = torch.load('/path/to/fine_tuning.pkl', map_location=device)
 cnet.load_state_dict(cnet_param)
 cnet.to(device=device)
 
-target_path = '../predict/flevoland15/fine_few.xlsx'
+target_path = '/path/to/fine_tuning.xlsx'
 target_path = os.path.join(target_path)
 book = xlsxwriter.Workbook(filename=target_path)
 sheet = book.add_worksheet('sheet')

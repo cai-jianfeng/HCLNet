@@ -4,6 +4,8 @@
 @FileName: superpixel.py
 @Date: 2022/12/12 9:18
 @Author: caijianfeng
+@Purpose: This file converts the .mat superpixel segmentation results into a visualization(.png)
+          and selects a training set based on the superpixel segmentation
 """
 import scipy.io as scio
 import numpy as np
@@ -15,12 +17,12 @@ import random
 from data_preprocess import Data
 
 # In[0] read superpixel
-file_path = '../data_flevoland4/T3_lee_sp_label.mat'
+file_path = '/path/to/superpixel.mat'
 matdata = scio.loadmat(file_path)
 # print(matdata.keys())
 useful_label = matdata['useful_sp_label']
 nums = []
-patch_size = [7, 7]
+patch_size = [15, 15]
 for i in tqdm(range(useful_label.shape[0])):
     for j in range(useful_label.shape[1]):
         if useful_label[i][j] not in nums:
@@ -28,7 +30,7 @@ for i in tqdm(range(useful_label.shape[0])):
 print(len(nums))  # 2719
 
 # In[1] plot superpixel
-color_path = '../data_flevoland4/color.xlsx'
+color_path = '/path/to/color.xlsx'
 colors = []
 color_sheets = xlrd.open_workbook(color_path)
 color_sheet = color_sheets.sheet_by_index(0)
@@ -41,7 +43,7 @@ print('color mat load succeed!')
 R = np.zeros_like(useful_label, dtype='uint8')
 G = np.zeros_like(useful_label, dtype='uint8')
 B = np.zeros_like(useful_label, dtype='uint8')
-label_file = '../data_flevoland4/label.xlsx'
+label_file = '/path/to/label.xlsx'
 label_book = xlrd.open_workbook(label_file)
 label_sheet = label_book.sheet_by_index(0)
 for i in tqdm(range(useful_label.shape[0])):
@@ -67,7 +69,7 @@ for j in tqdm(range(useful_label.shape[1])):
 superpixel_map = cv2.merge([B, G, R])
 # cv2.imshow('label', superpixel_map)
 # cv2.waitKey(0)
-save_path = '../data_flevoland4/T3_lee_sp_margin.png'
+save_path = '/path/to/superpixel.png'
 cv2.imwrite(save_path, superpixel_map)
 
 # In[2] cluster each superpixel
@@ -79,17 +81,18 @@ for i in tqdm(range(useful_label.shape[0] - patch_size[0])):
 
 # In[3] save as json
 superpixel_json = json.dumps(superpixel_dict)
-with open('../data_flevoland4/superpixel.json', 'w', encoding='utf-8') as f:
+with open('/path/to/superpixel.json', 'w', encoding='utf-8') as f:
     json.dump(superpixel_json, f, ensure_ascii=False, indent=2)
 
 # In[4] save train data_flevoland4
-fpath = '../data_flevoland4/superpixel.json'
-train_superpixel_list_path = '../data_flevoland4/train_superpixel.txt'
-data_size = 520  # num_superpixels / 100
+fpath = '/path/to/superpixel.json'
+train_superpixel_list_path = '/path/to/train_superpixel.txt'
+num_superpixels = 0
+data_size = num_superpixels / 100  # num_superpixels / 100
 batch_size = 64
-dim = [1393, 1193]
+dim = []  # the whole map size(subtract the patch size)
 data_util = Data()
-label_path = '../data_flevoland4/label.xlsx'
+label_path = '/path/to/label.xlsx'
 label_set = data_util.get_label_list(label_path=label_path)
 with open(fpath, 'r') as f:
     d = json.load(f)
@@ -103,7 +106,7 @@ for superpixel_id in superpixel_ids:
     random.shuffle(data_ids)
     i = 0
     for data_id in data_ids:
-        data_path = '../data_flevoland4/TRI/TRI' + str(datas[data_id][0] * dim[1] + datas[data_id][1]) + '.xlsx'
+        data_path = '/path/to/TRI/TRI' + str(datas[data_id][0] * dim[1] + datas[data_id][1]) + '.xlsx'
         label = label_set[datas[data_id][0] + patch_size[0] // 2][datas[data_id][1] + patch_size[1] // 2]
         if int(label) != 0:
             train_superpixel_list.append(data_path + '\t%d' % label + '\n')

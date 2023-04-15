@@ -1,6 +1,8 @@
 """
 created on:2023/2/14 20:05
 @author:caijianfeng
+@Purpose: PolSAR_Dataset is load data for CL, fine-tuning/train, and eval of our method/compared method
+          features_Dataset is load data for training classifier of Beam Search
 """
 from torch.utils.data import Dataset
 import os

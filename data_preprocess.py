@@ -317,7 +317,8 @@ class Data:
         data_detail_list['train_num'] = sum_train_list  # Amount of training data
         data_detail_list['eval_num'] = sum_eval_list  # Amount of test data
         data_detail_list['predict_num'] = sum_predict_list  # 预测数据量
-        jsons = json.dumps(data_detail_list, sort_keys=True, indent=4, separators=(',', ':'))  # Convert the dictionary to json
+        jsons = json.dumps(data_detail_list, sort_keys=True, indent=4,
+                           separators=(',', ':'))  # Convert the dictionary to json
         with open(os.path.join(target_path, 'readme.json'), 'w') as f:  # Writing data information
             f.write(jsons)
 
@@ -413,22 +414,23 @@ class Data:
 
     def save_contrastive_data_origin(self, data_path, target_path, contrastive_list_path, patch_size):
         """
-        保存对比学习训练数据
-        readme.json文件保存在二维数据块位置的父目录的父目录中
-        :param data_path: T矩阵的实部数据位置和虚部数据位置(list)
-        :param target_path: 分割后的数据保存位置(list), 包括二维数据块位置与一维特征集位置
-        :param contrastive_list_path: 对比训练集说明文件 --> str
-        :param patch_size: 切分的数据块的大小([row, column]) --> tuple
+        Save the contrastive learning training data
+        readme.json file is saved in the parent directory of the parent directory of the location of the 2D data block
+        :param data_path: The real part data location and imaginary part data location of the T matrix(list)
+        :param target_path: The storage location of the segmented data (list)
+                            includes the location of the two-dimensional data block and the location of the one-dimension features collection
+        :param contrastive_list_path: Contrastive learning training set specification file --> str
+        :param patch_size: The size of the data block to split([row, column]) --> tuple
         :return: None
         """
-        data_R_path = data_path[0]  # 实部数据集路径
-        data_I_path = data_path[1]  # 虚部数据集路径
+        data_R_path = data_path[0]  # Real part of the dataset path
+        data_I_path = data_path[1]  # Imaginary part of the dataset path
         data_R_sets = self.get_data_list(data_path=data_R_path)  # (channels, rows, cols)
         data_I_sets = self.get_data_list(data_path=data_I_path)  # (channels, rows, cols)
-        dim = data_R_sets.shape  # 数据维度:(channels, rows, columns)
-        sum_contrastive_list = 0  # 对比训练集的数据量
-        contrastive_list = []  # 对比训练集数据
-        data_detail_list = {}  # 数据信息说明
+        dim = data_R_sets.shape  # data dimension:(channels, rows, columns)
+        sum_contrastive_list = 0  # The amount of data in the training set for contrastive learning
+        contrastive_list = []  # Contrastive learning training set data
+        data_detail_list = {}  # Data information description
         # num = 0
         # flag = 0
         for i in range(0, dim[1] - patch_size[0]):

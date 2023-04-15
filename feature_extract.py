@@ -1,6 +1,9 @@
 """
 created on:2022/11/13 9:21
 @author:caijianfeng
+@Purpose: Here is a code implementation of part target decomposition.
+          We suggest that professional software is still used to generate the target decomposition automatically,
+          and the code generation may have some deviation and incomplete(only 28 target decomposition features, 7 groups)
 """
 import numpy as np
 

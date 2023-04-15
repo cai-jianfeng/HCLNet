@@ -17,7 +17,7 @@ from dataset import PolSAR_Dataset
 from torch.utils.data import DataLoader
 from net_run import run
 import xlsxwriter
-import matplotlib.pyplot as plt
+
 
 # In[1] generate train dataset
 contrastive_path = '/path/to/contrastive.txt'

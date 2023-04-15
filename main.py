@@ -17,7 +17,7 @@ import xlsxwriter
 
 sys.path.append(os.getcwd())  # Add the current working directory to your system path
 
-# In[1] 生成数据: 获取每个数据点的特征集合和数据块的T矩阵
+# In[1] Generate data: Get the set of features for each data point and the T-matrix of the data blocks
 data_path = ['/path/to/T_R.xlsx',
              '/path/to/T_I.xlsx']
 target_path = ['/path/to/T/',

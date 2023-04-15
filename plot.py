@@ -58,6 +58,7 @@ class plot_mode:
             cv2.imwrite(save_path, label_map)
         else:
             print('label_path/label_pic_name is necessary!')
+            return
     
     def plt_image(self, title, x_data, y_data, label, xlabel, ylabel, save_path, color='r'):
         """
@@ -87,7 +88,7 @@ class plot_mode:
             patch_size = [15, 15]
         if not label_path or not predict_path or not color_path or not label_pic_name:
             print('Necessary input parameters are missing!')
-            return None
+            return
 
         color_sheets = xlrd.open_workbook(color_path)
         color_sheet = color_sheets.sheet_by_index(0)
