@@ -51,30 +51,6 @@ optimizer = optim.Adam(params=oned_net.parameters(),
                        lr=lr,
                        weight_decay=1e-4)
 
-# In[5] train
-print('-----train-----')
-run_util = run()
-num_epoch = 10
-if __name__ == '__main__':
-    oned_net.train()
-    cost = []
-    accuracy = []
-
-    for epoch in range(num_epoch):
-        run_util.adjust_learning_rate(optimizer=optimizer,
-                                      epoch=epoch,
-                                      epochs=num_epoch,
-                                      lr=lr)
-        run_util.train(model=oned_net,
-                       epoch=[epoch, num_epoch],
-                       train_loader=train_loader,
-                       device=device,
-                       optimizer=optimizer,
-                       criterion=criterion,
-                       cost=cost)
-        # Saved model parameter
-        torch.save(oned_net.state_dict(), '/path/to/xxx.pkl'.format(epoch))
-
 
 class Classifier:
     def __init__(self, net):
@@ -83,7 +59,7 @@ class Classifier:
     def __call__(self, data, labels):
         predict = self.net(data)
         _, predict = torch.max(predict.data, dim=1)
-        acc = (predict == labels) / labels.size(0)
+        acc = (predict == labels).sum().item() / labels.size(0)
         return acc
 
 
@@ -121,27 +97,52 @@ def search_max(queue):
         return max_k if max_k else queue[0]
 
 
-theta = 0
-k = 2
-test_data = torch.randn((batch_size, 1, features_num))
-labels = torch.randn((batch_size, num_class))
-is_remove = [0 for _ in range(features_num)]
-queue_k = [is_remove.copy()]
-while features_num > theta:
-    queue_k_new = queue_k.copy()
-    for group in queue_k_new:
-        for i in range(len(group)):
-            if not group[i]:
-                group_new = group.copy()
-                group_new[i] = 1
-                if len(queue_k) < k:
-                    queue_k.append(group_new)
-                else:
-                    max_k = search_k(queue_k)
-                    if classifier(pad_zero_input(test_data, max_k), labels) < classifier(
-                            pad_zero_input(test_data, group_new), labels):
-                        queue_k.remove(max_k)
-                        queue_k.append(group_new)
-    features_num -= 1
+# In[5] train
+print('-----train-----')
+run_util = run()
+num_epoch = 10
+if __name__ == '__main__':
+    oned_net.train()
+    cost = []
+    accuracy = []
 
-features_group = search_max(queue_k)
+    for epoch in range(num_epoch):
+        run_util.adjust_learning_rate(optimizer=optimizer,
+                                      epoch=epoch,
+                                      epochs=num_epoch,
+                                      lr=lr)
+        run_util.train(model=oned_net,
+                       epoch=[epoch, num_epoch],
+                       train_loader=train_loader,
+                       device=device,
+                       optimizer=optimizer,
+                       criterion=criterion,
+                       cost=cost)
+        # Saved model parameter
+        torch.save(oned_net.state_dict(), '/path/to/xxx.pkl'.format(epoch))
+
+    theta = 0  # Number of features to keep
+    k = 5  # The best top k feature combinations are kept each time
+    test_data = torch.randn((batch_size, 1, features_num))  # Data to test the performance of feature combinations (batch size, channel=1, feature number=The total number of features at the beginning)
+    labels = torch.randn((batch_size, num_class))  # labels of test data
+    is_remove = [0 for _ in range(features_num)]  # Initially, none of the features are removed
+    queue_k = [is_remove]
+    while features_num > theta:
+        queue_k_new = queue_k.copy()
+        for group in queue_k_new:
+            for i in range(len(group)):
+                if not group[i]:
+                    group_new = group.copy()
+                    group_new[i] = 1
+                    if len(queue_k) < k:
+                        queue_k.append(group_new)
+                    else:
+                        max_k = search_k(queue_k)
+                        if classifier(pad_zero_input(test_data, max_k), labels) < classifier(
+                                pad_zero_input(test_data, group_new), labels):
+                            queue_k.remove(max_k)
+                            queue_k.append(group_new)
+        features_num -= 1
+
+    features_group = search_max(queue_k)  # Finally, the best feature combination is selected from k
+    print(features_group)
