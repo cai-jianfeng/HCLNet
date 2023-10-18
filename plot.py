@@ -8,6 +8,8 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 from tqdm import tqdm
+import seaborn as sns
+from data_preprocess import Data
 
 colors = []
 
@@ -19,7 +21,8 @@ class plot_mode:
                      predict: predict.
         """
         self.mode = mode
-    
+        self.data_util = Data()
+
     def plot_labels(self, label_path=None, color_path=None, label_pic_name=None):
         if color_path:
             color_sheets = xlrd.open_workbook(color_path)
@@ -123,3 +126,27 @@ class plot_mode:
         label_map = cv2.merge([B, G, R])
         save_path = label_pic_name
         cv2.imwrite(save_path, label_map)
+
+    def plot_confusion_matrix(self, label_path, predict_path, label_num, patch_size, save_path):
+        # get label and predict
+        label = self.data_util.get_label_list(label_path=label_path)
+        predict = self.data_util.get_label_list(label_path=predict_path)
+        # update label(sub patch size)
+        label = label[patch_size[0] // 2: label.shape[0] - (patch_size[0] - patch_size[1] // 2),
+                      patch_size[1] // 2: label.shape[1] - (patch_size[1] - patch_size[1] // 2)]
+        # compute confusion matrix
+        label_sum = np.zeros([label_num])
+        confusion_matrix = np.zeros([label_num, label_num], dtype=np.float)
+        for i in range(label_num):
+            label_sum[i] = np.sum(label == (i+1))
+            for j in range(label_num):
+                confusion_matrix[i][j] = np.sum((label == (i + 1)) & (predict == j)) / label_sum[i]
+        # plot confusion matrix
+        plt.figure(figsize=(10, 7))
+        sns.heatmap(confusion_matrix, annot=True, cmap="OrRd")
+        plt.xlabel("Predicted")
+        plt.ylabel("Actual")
+        plt.title("Confusion Matrix")
+        plt.savefig(save_path)
+        plt.show()
+        return confusion_matrix

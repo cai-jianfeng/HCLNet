@@ -34,7 +34,7 @@ class HetNet(nn.Module):
                                   out_channels=64,
                                   kernel_size=(3, 3),
                                   padding=(1, 1))
-        self.batchnorm2d_2 = nn.BatchNorm2d(num_features=64)
+        self.batchnorm2d_2 = nn.BatchNorm2d(num_features=64)   # b, c, w, h -> b, w, h, c -> bxwxh, c
         self.mp_1d = nn.MaxPool1d(kernel_size=(2,))
         self.mp_2d = nn.MaxPool2d(kernel_size=(2, 2))
         self.fc2 = nn.Linear(256, 128)
